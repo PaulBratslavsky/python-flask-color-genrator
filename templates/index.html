@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Generator</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="form">
+      <h1>Color Generator</h1>
+      <form id="form">
+        <input
+          type="text"
+          name="query"
+          id="prompt"
+          placeholder="Enter a color prompt"
+        />
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+    <div class="render-colors"></div>
+
+
+    <script>
+      const renderColorsDiv = document.querySelector(".render-colors");
+
+      const form = document.getElementById("form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const prompt = document.getElementById("prompt").value;
+
+        function renderColors(colors) {
+          const template = (color) => `
+            <div class="color">
+              <div style="background: ${color}">${color}</div>
+            </div>
+          `;
+
+          const html = colors.map(template).join("");
+          return html;
+        }
+        
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:5000/get-colors?query=${prompt}`,
+            { method: "POST" }
+          );
+          const data = await response.json();
+          renderColorsDiv.innerHTML = renderColors(data.colors);
+          alert("Colors generated successfully!");
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    </script>
+  </body>
+</html>
